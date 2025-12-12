@@ -65,7 +65,7 @@ class LeVoInference(torch.nn.Module):
             melody_is_wav = False
             torch.cuda.empty_cache()
         elif genre is not None and auto_prompt_path is not None:
-            auto_prompt = torch.load(auto_prompt_path)
+            auto_prompt = torch.load(auto_prompt_path, weights_only=False)
             prompt_token = auto_prompt[genre][np.random.randint(0, len(auto_prompt[genre]))]
             pmt_wav = prompt_token[:,[0],:]
             vocal_wav = prompt_token[:,[1],:]
@@ -78,7 +78,7 @@ class LeVoInference(torch.nn.Module):
             melody_is_wav = True
 
         audiolm = builders.get_lm_model(self.cfg)
-        checkpoint = torch.load(self.pt_path, map_location='cpu')
+        checkpoint = torch.load(self.pt_path, map_location='cpu', weights_only=False)
         audiolm_state_dict = {k.replace('audiolm.', ''): v for k, v in checkpoint.items() if k.startswith('audiolm')}
         audiolm.load_state_dict(audiolm_state_dict, strict=False)
         audiolm = audiolm.eval()

@@ -70,7 +70,7 @@ class LeVoInference(torch.nn.Module):
             pmt_wav, vocal_wav, bgm_wav = self.separator.run(prompt_audio_path)
             melody_is_wav = True
         elif genre is not None and auto_prompt_path is not None:
-            auto_prompt = torch.load(auto_prompt_path)
+            auto_prompt = torch.load(auto_prompt_path, weights_only=False)
             prompt_token = auto_prompt[genre][np.random.randint(0, len(auto_prompt[genre]))]
             pmt_wav = prompt_token[:,[0],:]
             vocal_wav = prompt_token[:,[1],:]

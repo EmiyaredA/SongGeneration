@@ -34,11 +34,25 @@ from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
 from transformers.utils import (
     add_start_docstrings,
     add_start_docstrings_to_model_forward,
-    is_flash_attn_available,
     logging,
     replace_return_docstrings,
 )
 from .configuration_llama import LlamaConfig
+
+# Compatibility: try to import is_flash_attn_available or is_flash_attn_2_available
+try:
+    from transformers.utils import is_flash_attn_2_available as is_flash_attn_available
+except ImportError:
+    try:
+        from transformers.utils import is_flash_attn_available
+    except ImportError:
+        # Fallback: check if flash_attn is available by trying to import it
+        def is_flash_attn_available():
+            try:
+                import flash_attn
+                return True
+            except ImportError:
+                return False
 
 
 if is_flash_attn_available():

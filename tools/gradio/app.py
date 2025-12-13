@@ -204,7 +204,7 @@ lyrics
         
         with gr.Column():
             output_audio = gr.Audio(label="Generated Song", type="numpy")
-            output_json = gr.JSON(label="Generated Info")
+            output_json = gr.Textbox(label="Generated Info", lines=10, max_lines=20)
     
         # # 示例按钮
         # examples = gr.Examples(
@@ -231,9 +231,14 @@ lyrics
         inputs=[lyric, description, prompt_audio, genre, cfg_coef, temperature, top_k],
         outputs=[output_audio, output_json]
     )
+    
+    # 包装函数用于生成纯音乐
+    def generate_bgm_song(lyric, description, prompt_audio, genre, cfg_coef, temperature, top_k):
+        return generate_song(lyric, description, prompt_audio, genre, cfg_coef, temperature, top_k, "bgm")
+    
     generate_bgm_btn.click(
-        fn=generate_song,
-        inputs=[lyric, description, prompt_audio, genre, cfg_coef, temperature, top_k, gr.State("bgm")],
+        fn=generate_bgm_song,
+        inputs=[lyric, description, prompt_audio, genre, cfg_coef, temperature, top_k],
         outputs=[output_audio, output_json]
     )
     

@@ -90,18 +90,18 @@ def generate_song(lyric, description=None, prompt_audio=None, genre=None, cfg_co
     lyric = lyric.replace("[intro]", "[intro-short]").replace("[inst]", "[inst-short]").replace("[outro]", "[outro-short]")
     paragraphs = [p.strip() for p in lyric.strip().split('\n\n') if p.strip()]
     if len(paragraphs) < 1:
-        return None, json.dumps("Lyrics can not be left blank")
+        return None, json.dumps("Lyrics can not be left blank", ensure_ascii=False)
     paragraphs_norm = []
     vocal_flag = False
     for para in paragraphs:
         lines = para.splitlines()
         struct_tag = lines[0].strip().lower()
         if struct_tag not in STRUCTS:
-            return None, json.dumps(f"Segments should start with a structure tag in {STRUCTS}")
+            return None, json.dumps(f"Segments should start with a structure tag in {STRUCTS}", ensure_ascii=False)
         if struct_tag in vocal_structs:
             vocal_flag = True
             if len(lines) < 2 or not [line.strip() for line in lines[1:] if line.strip()]:
-                return None, json.dumps("The following segments require lyrics: [verse], [chorus], [bridge]")
+                return None, json.dumps("The following segments require lyrics: [verse], [chorus], [bridge]", ensure_ascii=False)
             else:
                 new_para_list = []
                 for line in lines[1:]:
@@ -109,12 +109,12 @@ def generate_song(lyric, description=None, prompt_audio=None, genre=None, cfg_co
                 new_para_str = f"{struct_tag} {'.'.join(new_para_list)}"
         else:
             if len(lines) > 1:
-                return None, json.dumps("The following segments should not contain lyrics: [intro], [intro-short], [intro-medium], [inst], [inst-short], [inst-medium], [outro], [outro-short], [outro-medium]")
+                return None, json.dumps("The following segments should not contain lyrics: [intro], [intro-short], [intro-medium], [inst], [inst-short], [inst-medium], [outro], [outro-short], [outro-medium]", ensure_ascii=False)
             else:
                 new_para_str = struct_tag
         paragraphs_norm.append(new_para_str)
     if not vocal_flag:
-        return None, json.dumps(f"The lyric must contain at least one of the following structures: {vocal_structs}")
+        return None, json.dumps(f"The lyric must contain at least one of the following structures: {vocal_structs}", ensure_ascii=False)
     lyric_norm = " ; ".join(paragraphs_norm)
 
     # format prompt 
@@ -142,7 +142,7 @@ def generate_song(lyric, description=None, prompt_audio=None, genre=None, cfg_co
         "timestamp": datetime.now().isoformat(),
     }
     
-    return (sample_rate, audio_data), json.dumps(input_config, indent=2)
+    return (sample_rate, audio_data), json.dumps(input_config, indent=2, ensure_ascii=False)
 
 
 # 创建Gradio界面

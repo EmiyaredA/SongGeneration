@@ -86,6 +86,7 @@ def generate_song(lyric, description=None, prompt_audio=None, genre=None, cfg_co
     vocal_structs = ['[verse]', '[chorus]', '[bridge]']
     sample_rate = MODEL.cfg.sample_rate
     
+    
     # format lyric
     lyric = lyric.replace("[intro]", "[intro-short]").replace("[inst]", "[inst-short]").replace("[outro]", "[outro-short]")
     paragraphs = [p.strip() for p in lyric.strip().split('\n\n') if p.strip()]
@@ -183,10 +184,12 @@ lyrics
                         elem_id="single-select-radio"
                     )
                 with gr.Tab("Audio Prompt"):
+                    gr.Markdown("**注意**: 如果上传非 WAV 格式的音频文件，需要系统安装 ffmpeg。如果遇到错误，请使用 WAV 格式或安装 ffmpeg (`apt-get install ffmpeg` 或 `yum install ffmpeg`)。")
                     prompt_audio = gr.Audio(
                         label="Prompt Audio (Optional)",
                         type="filepath",
-                        elem_id="audio-prompt"
+                        elem_id="audio-prompt",
+                        sources=["upload"]
                     )
                 with gr.Tab("Text Prompt"):
                     gr.Markdown("For detailed usage, please refer to [here](https://github.com/tencent-ailab/SongGeneration?tab=readme-ov-file#-description-input-format)")

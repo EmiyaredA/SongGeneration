@@ -9,6 +9,34 @@ import os.path as op
 import torch
 from levo_inference_lowmem import LeVoInference
 
+# Workaround for gradio-client 1.3.0 bug with JSON schema processing
+# Monkey patch to avoid TypeError in get_api_info
+try:
+    from gradio_client import utils as client_utils
+    
+    # Patch get_type to handle non-dict schemas
+    original_get_type = client_utils.get_type
+    
+    def patched_get_type(schema):
+        if not isinstance(schema, dict):
+            return "Any"
+        return original_get_type(schema)
+    
+    client_utils.get_type = patched_get_type
+    
+    # Patch _json_schema_to_python_type to handle bool schemas
+    if hasattr(client_utils, '_json_schema_to_python_type'):
+        original_json_schema_to_python_type = client_utils._json_schema_to_python_type
+        
+        def patched_json_schema_to_python_type(schema, defs=None):
+            if not isinstance(schema, dict):
+                return "Any"
+            return original_json_schema_to_python_type(schema, defs)
+        
+        client_utils._json_schema_to_python_type = patched_json_schema_to_python_type
+except (ImportError, AttributeError):
+    pass
+
 EXAMPLE_LYRICS = """
 [intro-short]
 
@@ -203,7 +231,7 @@ lyrics
                 generate_bgm_btn = gr.Button("Generate Pure Music", variant="primary")
         
         with gr.Column():
-            output_audio = gr.Audio(label="Generated Song", type="numpy")
+            output_audio = gr.Audio(label="Generated Song")
             output_json = gr.Textbox(label="Generated Info", lines=10, max_lines=20)
     
         # # 示例按钮
@@ -246,4 +274,4 @@ lyrics
 # 启动应用
 if __name__ == "__main__":
     torch.set_num_threads(1)
-    demo.launch(server_name="0.0.0.0", server_port=8081)
+    demo.launch(server_name="0.0.0.0", server_port=8081, show_api=False)
